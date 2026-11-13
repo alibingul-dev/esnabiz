@@ -67,6 +67,21 @@ th{font-size:13px;color:var(--muted);font-weight:600;background:#FAFBFA}
 .lv-maliyet{--c:#B58A00;--ct:#6B5200;--bgc:#FBF6E4;--tc:#5C4600}
 .lv-destek{--c:#8A9690;--ct:#3D4D46;--bgc:#F1F2F0;--tc:#3D4D46}
 .lv .dot{background:var(--c)}.lv .tag{color:var(--ct)}.lv .todo{background:var(--bgc);color:var(--tc)}
+.splash{position:fixed;inset:0;z-index:100;background:var(--side);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .35s ease-out}
+.splash.hide{opacity:0;pointer-events:none}
+.splash svg{width:120px;height:120px}
+.splash .ring{opacity:0;animation:ring .6s ease-out forwards}
+.splash .ring.r2{animation-delay:.15s}
+.splash .sweep{transform-origin:60px 60px;animation:sweep 1s cubic-bezier(.4,0,.2,1) .2s forwards;transform:rotate(-200deg);opacity:0}
+.splash .blip{opacity:0;animation:blip .4s ease-out .9s forwards}
+.splash .word{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;color:#fff;opacity:0;transform:translateY(8px);animation:rise .45s ease-out .55s forwards}
+.splash .tag2{font-size:15px;color:#9FB0A8;opacity:0;animation:rise .45s ease-out .8s forwards}
+@keyframes ring{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+.splash .ring{transform-origin:60px 60px}
+@keyframes sweep{0%{opacity:1;transform:rotate(-200deg)}100%{opacity:1;transform:rotate(0)}}
+@keyframes blip{0%{opacity:0;r:0}60%{opacity:1;r:9}100%{opacity:1;r:6}}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.splash *{animation:none!important;opacity:1!important;transform:none!important}}
 @media (max-width:900px){
   .app{grid-template-columns:1fr}
   .top{display:flex;align-items:center;gap:12px;height:56px;padding:0 12px;background:var(--side);color:#fff;position:sticky;top:0;z-index:20}
@@ -85,6 +100,11 @@ th{font-size:13px;color:var(--muted);font-weight:600;background:#FAFBFA}
 </style>
 </head>
 <body>
+<div class="splash" id="splash" aria-hidden="true">
+<svg viewBox="0 0 120 120"><rect width="120" height="120" rx="26" fill="#0E6B5C"/><g fill="none" stroke="#fff" stroke-width="6.5"><circle class="ring" cx="60" cy="60" r="40"/><circle class="ring r2" cx="60" cy="60" r="16"/><path class="sweep" d="M60 60 L87 37" stroke-linecap="round"/></g><circle class="blip" cx="87" cy="37" r="6" fill="#FDBA74"/></svg>
+<div class="word">Esnabız</div>
+<div class="tag2">Haberin ola.</div>
+</div>
 <div class="top">
 <button class="burger" id="burger" type="button" aria-label="Menüyü aç"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
 <b>Esnabız</b>
@@ -116,6 +136,13 @@ th{font-size:13px;color:var(--muted);font-weight:600;background:#FAFBFA}
 <main id="main" aria-live="polite"></main>
 </div>
 <script>
+(function(){
+  var sp=document.getElementById('splash'),seen=false;
+  try{seen=sessionStorage.getItem('dr.splash')==='1';sessionStorage.setItem('dr.splash','1')}catch(e){}
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function hide(){sp.classList.add('hide');setTimeout(function(){sp.remove()},400)}
+  if(seen){sp.remove()}else{setTimeout(hide,reduce?300:1500);sp.addEventListener('click',hide)}
+})();
 (function(){
   var KEY_SEG='dr.segment',KEY_DONE='dr.done';
   function get(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
