@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Esnabız</title>
+<meta name="theme-color" content="#0E6B5C">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6F7F5;--card:#FFFFFF;--ink:#13221C;--muted:#3D4D46;--line:#E3E7E4;--accent:#0E6B5C;--accent-ink:#0A4038;--accent-soft:#EEF5F3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+.wrap{max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:18px 16px 14px;position:sticky;top:0;z-index:2}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{margin:0;font-family:'Space Grotesk',sans-serif;font-size:22px}
+.seg{background:var(--accent-soft);color:var(--accent-ink);font:inherit;font-size:13px;font-weight:600;padding:8px 12px;border-radius:999px;border:0;cursor:pointer;min-height:36px}
+.sub{margin:4px 0 0;font-size:14px;color:var(--muted)}
+main{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card.done{opacity:.55}
+.tag{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%}
+.card h2{margin:0;font-size:17px;line-height:1.3}
+.card p{margin:0;font-size:14px;line-height:1.5;color:var(--muted)}
+.todo{border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{flex:1;min-width:140px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:600;font-size:14px;border-radius:10px;min-height:44px;cursor:pointer;text-decoration:none;padding:0 12px}
+.btn.primary{background:var(--accent);color:#fff;border:0}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid #B9C3BE}
+.src{font-size:12px;color:var(--muted)}
+.src a{color:var(--accent-ink)}
+.picker{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.picker label{font-size:14px;font-weight:600}
+.picker select{font:inherit;font-size:16px;padding:12px;border:1px solid #B9C3BE;border-radius:8px;background:#fff;min-height:48px;width:100%}
+.empty{text-align:center;color:var(--muted);font-size:15px;padding:24px}
+footer{padding:20px 16px 28px;font-size:12px;line-height:1.5;color:var(--muted);text-align:center}
+.lv-acil{--c:#B42318;--ct:#912018;--bgc:#FBEAE9;--tc:#7A1A12}
+.lv-onemli{--c:#C4570A;--ct:#8A3B06;--bgc:#FDF3E7;--tc:#7A3E0A}
+.lv-maliyet{--c:#B58A00;--ct:#6B5200;--bgc:#FBF6E4;--tc:#5C4600}
+.lv-destek{--c:#8A9690;--ct:#3D4D46;--bgc:#F1F2F0;--tc:#3D4D46}
+.lv .dot{background:var(--c)}.lv .tag{color:var(--ct)}.lv .todo{background:var(--bgc);color:var(--tc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="row">
+<h1>Bugün</h1>
+<button class="seg" id="segBtn" type="button" aria-label="Segmenti değiştir">Segment seç</button>
+</div>
+<p class="sub" id="sub">Esnabız · Haberin ola.</p>
+</header>
+<main id="main" aria-live="polite"></main>
+<footer>Kişisel veri toplanmaz: seçimin ve işaretlerin yalnız bu cihazda saklanır.<br>Bilgiler kaynaklardan derlenir; kesin koşullar ilgili kurumun duyurusundadır.</footer>
+</div>
+<script>
+(function(){
+  var KEY_SEG='dr.segment', KEY_DONE='dr.done';
+  function get(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  var main=document.getElementById('main'), sub=document.getElementById('sub'), segBtn=document.getElementById('segBtn');
+  var LABEL={acil:'ACİL',onemli:'ÖNEMLİ',maliyet:'MALİYET',destek:'DESTEK'};
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function daysLeft(iso){if(!iso)return null;var d=new Date(iso+'T23:59:59+03:00')-new Date();return Math.ceil(d/86400000)}
+  function picker(segs){
+    sub.textContent='Sektörünü ve bölgeni seç';segBtn.textContent='Segment seç';
+    var opts=segs.map(function(s){return '<option value="'+esc(s.code)+'"'+(s.active?'':' disabled')+'>'+esc(s.sector)+' · '+esc(s.area)+(s.active?'':' (yakında)')+'</option>'}).join('');
+    main.innerHTML='<form class="picker" id="pf"><label for="sel">Sektör ve bölge</label><select id="sel">'+opts+'</select><button class="btn primary" type="submit">Bültenimi göster</button><p class="src">Hiçbir bilgi girmen gerekmez; seçimin yalnız bu cihazda tutulur.</p></form>';
+    document.getElementById('pf').addEventListener('submit',function(e){e.preventDefault();var c=document.getElementById('sel').value;set(KEY_SEG,c);load(c)});
+  }
+  function render(b){
+    var done=get(KEY_DONE,{});
+    segBtn.textContent=b.sector+' · '+b.area.split('/').pop().trim();
+    sub.textContent=b.date_label+' · '+b.items.length+' madde';
+    if(!b.items.length){main.innerHTML='<p class="empty">Bugün senin için yeni bir şey yok.</p>';return}
+    main.innerHTML=b.items.map(function(it){
+      var dl=daysLeft(it.deadline), tag=LABEL[it.level]||'';
+      if(dl!==null)tag+=dl>=0?' · son '+dl+' gün':' · süre doldu';
+      var h='<article class="card lv lv-'+esc(it.level)+(done[it.id]?' done':'')+'" data-id="'+esc(it.id)+'">'+
+        '<div class="tag"><span class="dot" aria-hidden="true"></span><span>'+esc(tag)+'</span></div>'+
+        '<h2>'+esc(it.title)+'</h2><p>'+esc(it.body)+'</p>';
+      if(it.action)h+='<div class="todo"><strong>Yapılacak:</strong> '+esc(it.action)+'</div>';
+      var btn='';
+      if(it.share)btn+='<a class="btn primary" href="https://wa.me/?text='+encodeURIComponent(it.share)+'" target="_blank" rel="noopener">WhatsApp\'ta müşavire ilet</a>';
+      if(it.action)btn+='<button class="btn ghost" type="button" data-done="'+esc(it.id)+'">'+(done[it.id]?'Geri al':'Tamamlandı')+'</button>';
+      if(btn)h+='<div class="btns">'+btn+'</div>';
+      if(it.source)h+='<p class="src">Kaynak: <a href="'+esc(it.source)+'" target="_blank" rel="noopener">'+esc(new URL(it.source).hostname.replace('www.',''))+'</a></p>';
+      return h+'</article>';
+    }).join('');
+  }
+  function load(code){
+    main.innerHTML='<p class="empty">Bülten yükleniyor…</p>';
+    fetch('data/'+encodeURIComponent(code)+'.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(render).catch(function(){main.innerHTML='<p class="empty">Bülten şu an yüklenemedi. Biraz sonra tekrar dene.</p>'});
+  }
+  main.addEventListener('click',function(e){
+    var b=e.target.closest('[data-done]');if(!b)return;
+    var id=b.getAttribute('data-done'),d=get(KEY_DONE,{});
+    if(d[id])delete d[id];else d[id]=Date.now();set(KEY_DONE,d);
+    var card=b.closest('.card');card.classList.toggle('done',!!d[id]);b.textContent=d[id]?'Geri al':'Tamamlandı';
+  });
+  var segs=[];
+  segBtn.addEventListener('click',function(){picker(segs)});
+  fetch('data/segments.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(j){
+    segs=j.segments||[];var c=get(KEY_SEG,null);
+    if(c&&segs.some(function(s){return s.code===c&&s.active}))load(c);else picker(segs);
+  }).catch(function(){main.innerHTML='<p class="empty">Uygulama şu an yüklenemedi.</p>'});
+})();
+</script>
+</body>
+</html>
