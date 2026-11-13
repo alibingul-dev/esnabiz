@@ -90,7 +90,7 @@ th{font-size:13px;color:var(--muted);font-weight:600;background:#FAFBFA}
 <div class="app">
 <aside id="side">
 <a class="brand" href="#bugun"><svg width="32" height="32" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="96" fill="#0E6B5C"/><g fill="none" stroke="#fff" stroke-width="28"><circle cx="256" cy="256" r="170"/><circle cx="256" cy="256" r="70"/><path d="M256 256 L370 160"/></g></svg><span><b>Esnabız</b><small>Haberin ola.</small></span></a>
-<div class="segbox"><label for="seg">Sektör ve bölge</label><select id="seg"></select></div>
+<div class="segbox"><label for="reg">Bölge</label><select id="reg"></select><label for="sec">İş</label><select id="sec"></select></div>
 <nav aria-label="Ana menü">
 <h3>Bülten</h3>
 <ul>
@@ -162,12 +162,29 @@ th{font-size:13px;color:var(--muted);font-weight:600;background:#FAFBFA}
   document.getElementById('burger').addEventListener('click',function(){side.classList.add('open');scrim.classList.add('open')});
   scrim.addEventListener('click',function(){side.classList.remove('open');scrim.classList.remove('open')});
   window.addEventListener('hashchange',render);
-  function load(code){bulletin=null;counts();main.innerHTML='<div class="empty">Bülten yükleniyor…</div>';fetch('data/'+encodeURIComponent(code)+'.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(b){bulletin=b;counts();render()}).catch(function(){main.innerHTML='<div class="empty">Bülten şu an yüklenemedi. Biraz sonra tekrar dene.</div>'})}
-  sel.addEventListener('change',function(){if(!sel.value)return;set(KEY_SEG,sel.value);load(sel.value)});
-  fetch('data/segments.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(j){
-    segs=j.segments||[];var c=get(KEY_SEG,null);
-    sel.innerHTML='<option value="">Seç…</option>'+segs.map(function(s){return '<option value="'+esc(s.code)+'"'+(s.active?'':' disabled')+'>'+esc(s.sector)+' · '+esc(s.area.split('/').pop().trim())+(s.active?'':' (yakında)')+'</option>'}).join('');
-    if(c&&segs.some(function(s){return s.code===c&&s.active})){sel.value=c;load(c)}else render();
+  var reg=document.getElementById('reg'),sec=document.getElementById('sec'),cat={regions:[],sectors:[]};
+  function j(u){return fetch(u,{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json()})}
+  function nameOf(list,code){var f=list.filter(function(x){return x.code===code})[0];return f?f.name:code}
+  function load(){
+    var r=reg.value,s=sec.value;bulletin=null;counts();
+    if(!r||!s){render();return}
+    set('dr.region',r);set('dr.sector',s);
+    main.innerHTML='<div class="empty">Bülten yükleniyor…</div>';
+    Promise.all([j('data/region/'+encodeURIComponent(r)+'.json'),j('data/sector/'+encodeURIComponent(s)+'.json').catch(function(){return {items:[]}})]).then(function(a){
+      var common=a[0],own=(a[1].items||[]);
+      bulletin={sector:nameOf(cat.sectors,s),area:nameOf(cat.regions,r),date_label:common.date_label,items:own.filter(function(i){return i.level==='acil'}).concat(common.items.filter(function(i){return i.level==='acil'}),own.filter(function(i){return i.level!=='acil'}),common.items.filter(function(i){return i.level!=='acil'})).sort(function(x,y){var o={acil:0,onemli:1,maliyet:2,destek:3};return o[x.level]-o[y.level]})};
+      counts();render();
+    }).catch(function(){main.innerHTML='<div class="empty">Bülten şu an yüklenemedi. Biraz sonra tekrar dene.</div>'});
+  }
+  reg.addEventListener('change',load);sec.addEventListener('change',load);
+  j('data/segments.json').then(function(c){
+    cat=c;
+    reg.innerHTML='<option value="">Bölge seç…</option>'+c.regions.map(function(x){return '<option value="'+esc(x.code)+'"'+(x.active?'':' disabled')+'>'+esc(x.name)+(x.active?'':' (yakında)')+'</option>'}).join('');
+    sec.innerHTML='<option value="">İş seç…</option>'+c.sectors.map(function(x){return '<option value="'+esc(x.code)+'">'+esc(x.name)+'</option>'}).join('');
+    var r=get('dr.region',null),s=get('dr.sector',null);
+    if(r&&c.regions.some(function(x){return x.code===r&&x.active}))reg.value=r;
+    if(s&&c.sectors.some(function(x){return x.code===s}))sec.value=s;
+    load();
   }).catch(function(){main.innerHTML='<div class="empty">Uygulama şu an yüklenemedi.</div>'});
 })();
 </script>

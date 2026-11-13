@@ -1,0 +1,37 @@
+{
+ "code": "KGT",
+ "date": "2026-11-13",
+ "date_label": "13 Kasım 2026",
+ "items": [
+  {
+   "id": "etebligat-2026-11",
+   "level": "acil",
+   "deadline": "2026-11-30",
+   "title": "e-Tebligat kaydı için son tarih 30 Kasım",
+   "body": "Elektronik tebligata katılması zorunlu olup henüz başvurmayan mükellefler 30 Kasım 2026'ya kadar kayıt olmalı. Uymayana Vergi Usul Kanunu cezaları uygulanabilir.",
+   "action": "Mali müşavirine \"e-Tebligat kaydımız var mı?\" diye sor.",
+   "share": "Merhaba, e-Tebligat kaydımız var mı? Son tarih 30 Kasım 2026. (Esnabız)",
+   "source": "https://24saatgazetesi.com/vergi-mukelleflerine-e-tebligat-uyarisi-basvuru-suresi-ve-muafiyetler-aciklandi"
+  },
+  {
+   "id": "vergi-ilan-2026-11",
+   "level": "onemli",
+   "deadline": "2026-11-20",
+   "title": "Vergi borcu ilan listesi 20 Kasım'da",
+   "body": "10 Kasım 2026 tarihli Resmî Gazete'ye göre 31 Aralık 2025 itibarıyla vadesi gelmiş ve 20 Kasım 2026'ya kadar ödenmemiş vergi ve cezalar açıklanacak. İlan sınırı 5 milyon TL.",
+   "action": "Vadesi geçen vergi borcun varsa 20 Kasım'dan önce kapat ya da yapılandır.",
+   "share": "Merhaba, vadesi geçmiş vergi borcumuz var mı? 20 Kasım 2026'da ilan listesi yayımlanıyor (sınır 5 milyon TL). (Esnabız)",
+   "source": "https://www.alomaliye.com/2026/11/10/vergi-usul-kanunu-genel-tebligi-sira-no-597/"
+  },
+  {
+   "id": "kosgeb-2026-11",
+   "level": "destek",
+   "deadline": null,
+   "title": "KOSGEB'de şu an açık çağrı yok",
+   "body": "Kapasite Geliştirme Destek Programı 2026 3. dönemi 15 Eylül 2026'da kapandı. Yeni dönem açılınca burada ilk sen göreceksin.",
+   "action": null,
+   "share": null,
+   "source": "https://www.alomaliye.com/2026/08/24/kobi-kapasite-destegi-basvurulari-basladi/amp/"
+  }
+ ]
+}

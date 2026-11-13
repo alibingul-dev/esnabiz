@@ -1,1 +1,74 @@
-{"segments":[{"code":"MTB-KGT","sector":"Matbaa ve baskı","area":"İstanbul / Kağıthane","active":true}]}
+{
+ "regions": [
+  {
+   "code": "KGT",
+   "name": "İstanbul / Kağıthane",
+   "active": true
+  },
+  {
+   "code": "SSL",
+   "name": "İstanbul / Şişli",
+   "active": false
+  },
+  {
+   "code": "BSK",
+   "name": "İstanbul / Beşiktaş",
+   "active": false
+  },
+  {
+   "code": "EYP",
+   "name": "İstanbul / Eyüpsultan",
+   "active": false
+  }
+ ],
+ "sectors": [
+  {
+   "code": "MTB",
+   "name": "Matbaa ve baskı"
+  },
+  {
+   "code": "MOB",
+   "name": "Mobilya imalatı"
+  },
+  {
+   "code": "TKS",
+   "name": "Tekstil ve konfeksiyon"
+  },
+  {
+   "code": "OTO",
+   "name": "Oto servis ve tamir"
+  },
+  {
+   "code": "RST",
+   "name": "Restoran ve kafe"
+  },
+  {
+   "code": "KUA",
+   "name": "Kuaför ve güzellik salonu"
+  },
+  {
+   "code": "MRK",
+   "name": "Market ve bakkal"
+  },
+  {
+   "code": "FRN",
+   "name": "Fırın ve pastane"
+  },
+  {
+   "code": "HRD",
+   "name": "Hırdavat ve yapı malzemesi"
+  },
+  {
+   "code": "EML",
+   "name": "Emlak ofisi"
+  },
+  {
+   "code": "KRT",
+   "name": "Kırtasiye"
+  },
+  {
+   "code": "ELK",
+   "name": "Elektrik ve elektronik servis"
+  }
+ ]
+}
